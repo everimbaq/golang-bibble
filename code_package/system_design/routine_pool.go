@@ -10,6 +10,7 @@ type RoutinePool struct {
 	Count      int
 	ifStopWork int32
 	wg         sync.WaitGroup
+	mtx        sync.Mutex
 }
 
 func (r *RoutinePool) Start() {
@@ -35,15 +36,20 @@ func (r *RoutinePool) Stop() {
 }
 
 func (r *RoutinePool) SafeStop() {
-
-	if atomic.LoadInt32(&r.ifStopWork) != 1 {
-		atomic.StoreInt32(&r.ifStopWork, 1)
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	if atomic.CompareAndSwapInt32(&r.ifStopWork, 0, 1) {
+		r.Stop()
 	}
-	r.Stop()
 }
 
 func (r *RoutinePool) AddTask(task func()) bool {
 	if atomic.LoadInt32(&r.ifStopWork) == 1 {
+		return false
+	}
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	if r.ifStopWork == 1 {
 		return false
 	}
 	r.Tasks <- task

@@ -11,6 +11,7 @@ type RoutinePool struct {
 	ifStopWork int32
 	wg         sync.WaitGroup
 	mtx        sync.Mutex
+	once       sync.Once
 }
 
 func (r *RoutinePool) Start() {
@@ -30,17 +31,15 @@ func (r *RoutinePool) Start() {
 	}
 }
 
-func (r *RoutinePool) Stop() {
+func (r *RoutinePool) doStop() {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
 	close(r.Tasks)
 	r.wg.Wait()
 }
 
 func (r *RoutinePool) SafeStop() {
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
-	if atomic.CompareAndSwapInt32(&r.ifStopWork, 0, 1) {
-		r.Stop()
-	}
+	r.once.Do(r.doStop)
 }
 
 func (r *RoutinePool) AddTask(task func()) bool {

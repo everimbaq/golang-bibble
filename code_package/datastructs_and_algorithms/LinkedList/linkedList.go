@@ -7,58 +7,56 @@ type Node struct {
 	Data interface{}
 }
 
-type ListData interface {}
+type ListData interface{}
 
 type MyLinkedList *Node
 
-func (mynode *Node)FindNth(pos int) ListData{
+func (node *Node) FindNth(pos int) ListData {
 
-	if mynode == nil{
+	if node == nil {
 		return nil
 	}
 
-	if pos <=1{
-		return mynode.Data
+	if pos <= 1 {
+		return node.Data
 	}
-	return mynode.next.FindNth(pos -1)
+	return node.next.FindNth(pos - 1)
 
 }
 
-func (node *Node)Insert(pos int, data ListData) error {
+func (node *Node) Insert(pos int, data ListData) error {
 	curNode := node
-	for tmp :=1;;tmp++{
-
-		if tmp == pos{
+	for tmp := 1; ; tmp++ {
+		if tmp == pos {
 			newNode := Node{curNode.next, data}
 			curNode.next = &newNode
 			return nil
-		}else if tmp < pos{
+		} else if tmp < pos {
 
-			if curNode.next == nil && tmp +1 == pos{
+			if curNode.next == nil && tmp+1 == pos {
 				newNode := Node{curNode.next, data}
 				curNode.next = &newNode
 				return nil
-			}else if curNode.next != nil{
+			} else if curNode.next != nil {
 				curNode = curNode.next
-			}else {
+			} else {
 				return fmt.Errorf("list is not long enough")
 			}
-		}else{
+		} else {
 			return fmt.Errorf("list is not long enough")
 		}
-
 	}
 }
 
-func(node *Node)Delete(pos int) (interface{}, error ){
+func (node *Node) Delete(pos int) (interface{}, error) {
 	curNode := node
 	var tmp int = 1
-	for curNode != nil && tmp < pos-1{
+	for curNode != nil && tmp < pos-1 {
 		curNode = curNode.next
 		tmp++
 	}
 
-	if curNode == nil || tmp > pos-1{
+	if curNode == nil || tmp > pos-1 {
 		return nil, fmt.Errorf("list is not long enough")
 	}
 
@@ -66,9 +64,8 @@ func(node *Node)Delete(pos int) (interface{}, error ){
 	if tmpNode == nil {
 		return nil, fmt.Errorf("list is not long enough")
 
-	}else {
+	} else {
 		curNode.next = tmpNode.next
-		return tmpNode.Data ,nil
+		return tmpNode.Data, nil
 	}
-
 }

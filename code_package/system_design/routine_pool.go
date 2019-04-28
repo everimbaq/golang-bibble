@@ -25,7 +25,6 @@ func (r *RoutinePool) Start() {
 					return
 				}
 				task()
-
 			}
 		}()
 	}

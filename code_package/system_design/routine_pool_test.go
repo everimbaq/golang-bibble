@@ -50,7 +50,7 @@ func BenchmarkRoutinePool(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		rp := &RoutinePool{
 			Tasks: make(chan func(), 10000),
-			Count: 10,
+			Count: 1000,
 		}
 		rp.Start()
 		b.StartTimer()
@@ -59,7 +59,7 @@ func BenchmarkRoutinePool(b *testing.B) {
 	}
 }
 
-func BenchmarkNoRoutinePool(b *testing.B) {
+func BenchmarkRoutinePoolNo(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.Log(execNoPool())
 	}
